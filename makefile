@@ -5,3 +5,6 @@ BUILD:
 
 SWAG:
 	swag init -g cmd/main.go
+
+TEST:
+	go test -v ./...
