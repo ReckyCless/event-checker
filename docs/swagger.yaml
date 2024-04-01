@@ -1,0 +1,988 @@
+basePath: /
+definitions:
+  app.Event:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      end_time:
+        type: string
+      image_path:
+        type: string
+      location:
+        type: string
+      start_time:
+        type: string
+      title:
+        type: string
+      type_id:
+        type: integer
+      type_name:
+        type: string
+      user_email:
+        type: string
+      user_id:
+        type: integer
+      user_name:
+        type: string
+      user_patronymic:
+        type: string
+      user_phone:
+        type: string
+      user_surname:
+        type: string
+    required:
+    - description
+    - location
+    - start_time
+    - title
+    - type_id
+    type: object
+  app.EventType:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  app.UpdateEventInput:
+    properties:
+      description:
+        type: string
+      end_time:
+        type: string
+      image_path:
+        type: string
+      location:
+        type: string
+      start_time:
+        type: string
+      title:
+        type: string
+      type_id:
+        type: integer
+    type: object
+  app.UpdateEventTypeInput:
+    properties:
+      title:
+        type: string
+    type: object
+  app.UpdateVisitorInput:
+    properties:
+      birth_date:
+        type: string
+      email:
+        type: string
+      is_visited:
+        type: boolean
+      name:
+        type: string
+      patronymic:
+        type: string
+      phone:
+        type: string
+      surname:
+        type: string
+    type: object
+  app.User:
+    properties:
+      birth_date:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      image_path:
+        type: string
+      name:
+        type: string
+      organisator_id:
+        type: integer
+      password:
+        type: string
+      patronymic:
+        type: string
+      phone:
+        type: string
+      role_id:
+        type: integer
+      surname:
+        type: string
+    required:
+    - name
+    - password
+    - role_id
+    - surname
+    type: object
+  app.Visitor:
+    properties:
+      birth_date:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      event_id:
+        type: integer
+      is_visited:
+        type: boolean
+      name:
+        type: string
+      patronymic:
+        type: string
+      phone:
+        type: string
+      surname:
+        type: string
+      user_birth_date:
+        type: string
+      user_email:
+        type: string
+      user_name:
+        type: string
+      user_patronymic:
+        type: string
+      user_phone:
+        type: string
+      user_surname:
+        type: string
+    required:
+    - birth_date
+    - name
+    - patronymic
+    - surname
+    type: object
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.getAllEventsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/app.Event'
+        type: array
+    type: object
+  handler.singInInput:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: API Server for Event Checker Application
+  title: Event Checker API
+  version: "1.0"
+paths:
+  /api/events:
+    get:
+      consumes:
+      - application/json
+      description: get all events
+      operationId: get-all-events
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.getAllEventsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get All Events
+      tags:
+      - events
+  /api/events/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get event by id
+      operationId: get-event-by-id
+      parameters:
+      - description: event id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Event'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get Event By ID
+      tags:
+      - events
+  /api/events/{id}/visitors:
+    post:
+      consumes:
+      - application/json
+      description: create event visitor
+      operationId: create-event-visitor
+      parameters:
+      - description: event id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: visitor info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/app.Visitor'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Create Event Visitor
+      tags:
+      - visitors
+  /api/events/authorised:
+    get:
+      consumes:
+      - application/json
+      description: get all events created by user
+      operationId: get-all-user-events
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.getAllEventsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Events by User
+      tags:
+      - events
+    post:
+      consumes:
+      - application/json
+      description: create event
+      operationId: create-event
+      parameters:
+      - description: event info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/app.Event'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Event
+      tags:
+      - events
+  /api/events/authorised/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete event
+      operationId: delete-event
+      parameters:
+      - description: event id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Event by ID
+      tags:
+      - events
+    put:
+      consumes:
+      - application/json
+      description: update event
+      operationId: update-event
+      parameters:
+      - description: event id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: event info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/app.UpdateEventInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Event by ID
+      tags:
+      - events
+  /api/events/authorised/{id}/visitors:
+    post:
+      consumes:
+      - application/json
+      description: create event visitor as user
+      operationId: user-create-event-visitor
+      parameters:
+      - description: event id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Event Visitor as User
+      tags:
+      - visitors
+  /api/events/authorised/{id}/visitors/:
+    get:
+      consumes:
+      - application/json
+      description: get all event visitors
+      operationId: get-all-event-visitors
+      parameters:
+      - description: event id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/app.Visitor'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get All Event Visitors
+      tags:
+      - visitors
+  /api/events/authorised/{id}/visitors/{visitor_id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete event visitor
+      operationId: delete-event-visitor
+      parameters:
+      - description: event id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: visitor id
+        in: path
+        name: visitor_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Event Visitor By ID
+      tags:
+      - visitors
+    get:
+      consumes:
+      - application/json
+      description: get event visitor by id
+      operationId: get-event-visitor-by-id
+      parameters:
+      - description: event id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: visitor id
+        in: path
+        name: visitor_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.Visitor'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Event Visitor By ID
+      tags:
+      - visitors
+    put:
+      consumes:
+      - application/json
+      description: update event visitor
+      operationId: update-event-visitor
+      parameters:
+      - description: event id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: visitor id
+        in: path
+        name: visitor_id
+        required: true
+        type: integer
+      - description: visitor info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/app.UpdateVisitorInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Event Visitor by ID
+      tags:
+      - visitors
+  /api/types:
+    get:
+      consumes:
+      - application/json
+      description: get all events created by user
+      operationId: get-all-events-types
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/app.EventType'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get All Events Types
+      tags:
+      - types
+  /api/types/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get event type by id
+      operationId: get-event-type-by-id
+      parameters:
+      - description: event type id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.EventType'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get Event Type By ID
+      tags:
+      - types
+  /api/types/authorised:
+    post:
+      consumes:
+      - application/json
+      description: create event type
+      operationId: create-event-type
+      parameters:
+      - description: event type info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/app.EventType'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Event Type
+      tags:
+      - types
+  /api/types/authorised/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete event type
+      operationId: delete-type
+      parameters:
+      - description: event type id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Event Type by ID
+      tags:
+      - types
+    put:
+      consumes:
+      - application/json
+      description: update event type
+      operationId: update-type
+      parameters:
+      - description: event type id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: event type info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/app.UpdateEventTypeInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Event Type by ID
+      tags:
+      - types
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: login
+      operationId: login
+      parameters:
+      - description: credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.singInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: SignIn
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: create account
+      operationId: create-account
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/app.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: SignUp
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
