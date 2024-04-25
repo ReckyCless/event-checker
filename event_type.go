@@ -9,6 +9,17 @@ type EventType struct {
 	ID        int        `json:"id" db:"id"`
 	Name      string     `json:"name" binding:"required" db:"name"`
 	CreatedAt *time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at" db:"created_at"`
+}
+
+type CreateEventTypeInput struct {
+	Name string `json:"name" binding:"required" db:"name"`
+}
+
+type GetEventTypeOutput struct {
+	Name      string     `json:"name" db:"name"`
+	CreatedAt *time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at" db:"created_at"`
 }
 
 type UpdateEventTypeInput struct {

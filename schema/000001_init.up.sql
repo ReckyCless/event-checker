@@ -6,28 +6,32 @@ CREATE TABLE "events" (
   "image_path" text,
   "start_time" timestamp NOT NULL,
   "end_time" timestamp,
-  "user_id" integer NOT NULL,
+  "creator_id" integer NOT NULL,
   "type_id" integer NOT NULL,
-  "created_at" timestamp
+  "created_at" timestamp,
+  "updated_at" timestamp
 );
 
 CREATE TABLE "events_types" (
   "id" integer PRIMARY KEY generated always as identity,
   "name" text NOT NULL,
-  "created_at" timestamp
+  "created_at" timestamp,
+  "updated_at" timestamp
 );
 
 CREATE TABLE "events_tags" (
   "event_id" integer,
   "tag_id" integer,
   "created_at" timestamp,
+  "updated_at" timestamp,
   PRIMARY KEY ("event_id", "tag_id")
 );
 
 CREATE TABLE "tags" (
   "id" integer PRIMARY KEY generated always as identity,
   "name" text NOT NULL,
-  "created_at" timestamp
+  "created_at" timestamp,
+  "updated_at" timestamp
 );
 
 CREATE TABLE "users" (
@@ -37,12 +41,14 @@ CREATE TABLE "users" (
   "surname" text NOT NULL,
   "patronymic" text,
   "birth_date" date NOT NULL,
+  "sex" boolean NOT NULL,
   "phone" text,
   "email" text,
   "image_path" text,
   "role_id" integer NOT NULL,
   "organisator_id" integer,
-  "created_at" timestamp
+  "created_at" timestamp,
+  "updated_at" timestamp
 );
 
 CREATE TABLE "events_visitors" (
@@ -53,10 +59,12 @@ CREATE TABLE "events_visitors" (
   "surname" text,
   "patronymic" text,
   "birth_date" date,
+  "sex" boolean NOT NULL,
   "phone" text,
   "email" text,
   "is_visited" boolean NOT NULL DEFAULT false,
-  "created_at" timestamp
+  "created_at" timestamp,
+  "updated_at" timestamp,
   UNIQUE (user_id, event_id)
 );
 
@@ -65,7 +73,8 @@ CREATE TABLE "organisators" (
   "title" text NOT NULL,
   "logo_path" text,
   "site_url" text,
-  "created_at" timestamp
+  "created_at" timestamp,
+  "updated_at" timestamp
 );
 
 CREATE TABLE "roles" (
@@ -89,9 +98,9 @@ ALTER TABLE "events_visitors" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("i
 
 ALTER TABLE "events_visitors" ADD FOREIGN KEY ("event_id") REFERENCES "events" ("id") ON DELETE NULL ON UPDATE CASCADE;
 
-INSERT INTO "roles" ("name") VALUES('admin');
-INSERT INTO "roles" ("name") VALUES('manager');
-INSERT INTO "roles" ("name") VALUES('user');
+INSERT INTO "roles" ("name") VALUES('Администратор');
+INSERT INTO "roles" ("name") VALUES('Организатор');
+INSERT INTO "roles" ("name") VALUES('Пользователь');
 
 INSERT INTO "types" ("name") VALUES('Меропритие');
 INSERT INTO "types" ("name") VALUES('Конкурс');

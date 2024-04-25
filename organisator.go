@@ -13,6 +13,18 @@ type Organisator struct {
 	CreatedAt *time.Time `json:"created_at" db:"created_at"`
 }
 
+type CreateOrganisatorInput struct {
+	Title    string  `json:"title" binding:"required" db:"title"`
+	LogoPath *string `json:"logo_path" db:"logo_path"`
+	SiteUrl  *string `json:"site_url" db:"site_url"`
+}
+
+type GetOrganisatorOutput struct {
+	Title    string  `json:"title" db:"title"`
+	LogoPath *string `json:"logo_path" db:"logo_path"`
+	SiteUrl  *string `json:"site_url" db:"site_url"`
+}
+
 type UpdateOrganisatorInput struct {
 	Title    *string `json:"title" db:"title"`
 	LogoPath *string `json:"logo_path" db:"logo_path"`
