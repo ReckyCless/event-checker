@@ -25,65 +25,98 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	api := router.Group("/api")
 	{
-		events := api.Group("/events")
+		v1 := api.Group("/v1")
 		{
-			events.GET("/", h.getAllEvents)
-			events.GET("/:id", h.getEventByID)
-			authorised := events.Group("/authorised", h.userIdentity)
+			//Public API Routes
+			public := v1.Group("/public")
 			{
-				authorised.GET("/", h.getAllEventsForUser)
-				authorised.POST("/", h.createEvent)
-				authorised.PUT("/:id", h.updateEvent)
-				authorised.DELETE("/:id", h.deleteEvent)
-
-				visitors := authorised.Group("/:id/visitors")
+				auth := public.Group("/auth")
 				{
-					visitors.POST("/", h.createVisitorAsUser)
-					visitors.GET("/", h.getAllEventVisitors)
-					visitors.GET("/:visitor_id", h.getVisitorByID)
-					visitors.PUT("/:visitor_id", h.updateVisitor)
-					visitors.DELETE("/:visitor_id", h.deleteVisitor)
+					auth.POST("/sign-up", h.signUp)
+					auth.POST("/sign-in", h.signIn)
+				}
+
+				events := public.Group("/events")
+				{
+					events.GET("/", h.getAllEvents)
+					events.GET("/:id", h.getEventByID)
+
+					//Events Visitors Router Group
+					visitors := events.Group(":id/visitors")
+					{
+						visitors.POST("/", h.createVisitor)
+					}
+				}
+
+				organisators := public.Group("/organisators")
+				{
+					organisators.GET("/", h.getAllOrganisators)
+					organisators.GET("/:id", h.getOrganisatorByID)
+				}
+
+				types := public.Group("/types")
+				{
+					types.GET("/", h.getAllEventTypes)
+					types.GET("/:id", h.getEventTypeByID)
+				}
+
+				roles := public.Group("/roles")
+				{
+					roles.GET("/", h.getAllRoles)
+					roles.GET("/:id", h.getRoleByID)
 				}
 			}
-			visitors := events.Group(":id/visitors")
-			{
-				visitors.POST("/", h.createVisitor)
-			}
-		}
 
-		organisators := api.Group("/organisators")
-		{
-			organisators.GET("/", h.getAllOrganisators)
-			organisators.GET("/:id", h.getOrganisatorByID)
-			authorised := organisators.Group("/authorised", h.userIdentity)
+			//Private API Routes
+			private := v1.Group("/private", h.userIdentity)
 			{
-				authorised.POST("/", h.createOrganisator)
-				authorised.PUT("/:id", h.updateOrganisator)
-				authorised.DELETE("/:id", h.deleteOrganisator)
-			}
-		}
+				events := private.Group("/events")
+				{
+					events.GET("/", h.getAllEventsForUser)
+					events.POST("/", h.createEvent)
+					events.PUT("/:id", h.updateEvent)
+					events.DELETE("/:id", h.deleteEvent)
 
-		types := api.Group("/types")
-		{
-			types.GET("/", h.getAllEventTypes)
-			types.GET("/:id", h.getEventTypeByID)
-			authorised := types.Group("/authorised", h.userIdentity)
-			{
-				authorised.POST("/", h.createEventType)
-				authorised.PUT("/:id", h.updateEventType)
-				authorised.DELETE("/:id", h.deleteEventType)
-			}
-		}
+					visitors := events.Group("/:id/visitors")
+					{
+						visitors.POST("/", h.createVisitorAsUser)
+						visitors.GET("/", h.getAllEventVisitors)
+						visitors.GET("/:visitor_id", h.getVisitorByID)
+						visitors.PUT("/:visitor_id", h.updateVisitor)
+						visitors.DELETE("/:visitor_id", h.deleteVisitor)
+					}
+				}
 
-		users := api.Group("/users")
-		{
-			roles := users.Group("/:id/roles")
-			{
-				roles.PUT("/", h.updateUserRole)
-			}
-			organisators := users.Group("/:id/organisators")
-			{
-				organisators.PUT("/", h.updateUserOrganisator)
+				organisators := private.Group("/organisators")
+				{
+					organisators.POST("/", h.createOrganisator)
+					organisators.PUT("/:id", h.updateOrganisator)
+					organisators.DELETE("/:id", h.deleteOrganisator)
+				}
+
+				types := private.Group("/types")
+				{
+					types.POST("/", h.createEventType)
+					types.PUT("/:id", h.updateEventType)
+					types.DELETE("/:id", h.deleteEventType)
+				}
+
+				roles := private.Group("/roles")
+				{
+					roles.PUT("/:id", h.updateRole)
+				}
+
+				users := private.Group("/users")
+				{
+					roles := users.Group("/:id/roles")
+					{
+						roles.PUT("/", h.updateUserRole)
+					}
+					organisators := users.Group("/:id/organisators")
+					{
+						organisators.PUT("/", h.updateUserOrganisator)
+					}
+				}
 			}
 		}
 	}

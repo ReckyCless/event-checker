@@ -13,15 +13,15 @@ func NewEventTypeService(repo repository.EventType) *EventTypeService {
 	return &EventTypeService{repo: repo}
 }
 
-func (s *EventTypeService) Create(eventType app.EventType) (int, error) {
+func (s *EventTypeService) Create(eventType app.CreateEventTypeInput) (int, error) {
 	return s.repo.Create(eventType)
 }
 
-func (s *EventTypeService) GetAll() ([]app.EventType, error) {
+func (s *EventTypeService) GetAll() ([]app.GetEventTypeOutput, error) {
 	return s.repo.GetAll()
 }
 
-func (s *EventTypeService) GetByID(eventTypeID int) (app.EventType, error) {
+func (s *EventTypeService) GetByID(eventTypeID int) (app.GetEventTypeOutput, error) {
 	return s.repo.GetByID(eventTypeID)
 }
 

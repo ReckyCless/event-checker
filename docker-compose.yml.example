@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  event-checker-go:
+    restart: always
+    build: ./
+    command: ./wait-for-postgres.sh db ./event-checker-go
+    ports:
+    - 8000:8000
+    depends_on:
+      - db
+    environment:
+    - DB_PASSWORD=...
+    - JWT_SIGNING_KEY=...
+    - USER_PASSWORD_SALT=...
+    
+  db:
+    restart: always
+    image: postgres:latest
+    volumes:
+      -./.database/postgres/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=...
+    ports:
+      - 5432:5432
+

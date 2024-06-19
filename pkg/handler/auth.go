@@ -11,16 +11,16 @@ import (
 // @Tags auth
 // @Description create account
 // @ID create-account
-// @Accept  json
-// @Produce  json
-// @Param input body app.User true "account info"
+// @Accept json
+// @Produce json
+// @Param input body app.CreateUserInput true "account input"
 // @Success 200 {integer} integer 1
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /auth/sign-up [post]
+// @Router /api/v1/public/auth/sign-up [post]
 func (h *Handler) signUp(c *gin.Context) {
-	var input app.User
+	var input app.CreateUserInput
 
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -46,14 +46,14 @@ type singInInput struct {
 // @Tags auth
 // @Description login
 // @ID login
-// @Accept  json
-// @Produce  json
+// @Accept json
+// @Produce json
 // @Param input body singInInput true "credentials"
 // @Success 200 {string} string "token"
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /auth/sign-in [post]
+// @Router /api/v1/public/auth/sign-in [post]
 func (h *Handler) signIn(c *gin.Context) {
 	var input singInInput
 

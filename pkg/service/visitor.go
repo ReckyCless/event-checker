@@ -17,28 +17,26 @@ func NewVisitorService(repo repository.Visitor, eventRepo repository.Event) *Vis
 func (s *VisitorService) CreateAsUser(userID, eventID int) (int, error) {
 	_, err := s.eventRepo.GetByID(eventID)
 	if err != nil {
-		//event does not exsists
 		return 0, err
 	}
 
 	return s.repo.CreateAsUser(userID, eventID)
 }
 
-func (s *VisitorService) Create(eventID int, visitor app.Visitor) (int, error) {
+func (s *VisitorService) Create(eventID int, visitor app.CreateVisitorInput) (int, error) {
 	_, err := s.eventRepo.GetByID(eventID)
 	if err != nil {
-		//event does not exsists
 		return 0, err
 	}
 
 	return s.repo.Create(eventID, visitor)
 }
 
-func (s *VisitorService) GetAllEventVisitors(userID, eventID int) ([]app.Visitor, error) {
+func (s *VisitorService) GetAllEventVisitors(userID, eventID int) ([]app.GetVisitorOutput, error) {
 	return s.repo.GetAllEventVisitors(userID, eventID)
 }
 
-func (s *VisitorService) GetByID(userID, visitorID int) (app.Visitor, error) {
+func (s *VisitorService) GetByID(userID, visitorID int) (app.GetVisitorOutput, error) {
 	return s.repo.GetByID(userID, visitorID)
 }
 

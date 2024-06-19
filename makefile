@@ -1,10 +1,16 @@
 .SILENT:
 
-BUILD:
-	go run cmd/main.go
+build:
+	docker-compose build event-checker-go
 
-SWAG:
+run:
+	docker-compose up event-checker-go
+
+swag:
 	swag init -g cmd/main.go
 
-TEST:
+test:
 	go test -v ./...
+
+migrate:
+	migrate -path ./schema -database 'postgres://postgres:805nWgQ7BACz6Gf@0.0.0.0:5432/postgres?sslmode=disable' up

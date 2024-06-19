@@ -18,7 +18,7 @@ func NewOrganisatorPostgres(db *sqlx.DB) *OrganisatorPostgres {
 	return &OrganisatorPostgres{db: db}
 }
 
-func (r *OrganisatorPostgres) Create(organisator app.Organisator) (int, error) {
+func (r *OrganisatorPostgres) Create(organisator app.CreateOrganisatorInput) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
@@ -46,8 +46,8 @@ func (r *OrganisatorPostgres) Create(organisator app.Organisator) (int, error) {
 	return organisatorID, tx.Commit()
 }
 
-func (r *OrganisatorPostgres) GetAll() ([]app.Organisator, error) {
-	var organisators []app.Organisator
+func (r *OrganisatorPostgres) GetAll() ([]app.GetOrganisatorOutput, error) {
+	var organisators []app.GetOrganisatorOutput
 	query := fmt.Sprintf(`SELECT *
 	FROM %s`, organisatorsTable)
 	if err := r.db.Select(&organisators, query); err != nil {
@@ -57,8 +57,8 @@ func (r *OrganisatorPostgres) GetAll() ([]app.Organisator, error) {
 	return organisators, nil
 }
 
-func (r *OrganisatorPostgres) GetByID(organisatorID int) (app.Organisator, error) {
-	var organisator app.Organisator
+func (r *OrganisatorPostgres) GetByID(organisatorID int) (app.GetOrganisatorOutput, error) {
+	var organisator app.GetOrganisatorOutput
 	query := fmt.Sprintf(`SELECT *
 	FROM %s WHERE id=$1`, organisatorsTable)
 	if err := r.db.Get(&organisator, query, organisatorID); err != nil {
@@ -101,6 +101,10 @@ func (r *OrganisatorPostgres) Update(organisatorID int, input app.UpdateOrganisa
 		args = append(args, *input.SiteUrl)
 		argID++
 	}
+	// Set UpdatedAt Time
+	setValues = append(setValues, fmt.Sprintf("updated_at=$%d", argID))
+	args = append(args, time.Now().UTC())
+	argID++
 
 	setQuery := strings.Join(setValues, ", ")
 

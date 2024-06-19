@@ -16,13 +16,12 @@ func NewAuthPostgres(db *sqlx.DB) *AuthPostgres {
 	return &AuthPostgres{db: db}
 }
 
-func (r *AuthPostgres) CreateUser(user app.User) (int, error) {
+func (r *AuthPostgres) CreateUser(user app.CreateUserInput) (int, error) {
 	var id int
-	query := fmt.Sprintf("INSERT INTO %s (password_hash, name, surname, patronymic, birth_date, phone, email, image_path, role_id, organisator_id, created_at) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id", usersTable)
+	query := fmt.Sprintf("INSERT INTO %s (password_hash, name, surname, patronymic, birth_date, sex, phone, email, image_path, role_id, created_at) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id", usersTable)
 
-	// TODO: Change role paramert from const to normal role distribution
-	const role = 1
-	row := r.db.QueryRow(query, user.Password, user.Name, user.Surname, user.Patronymic, user.BirthDate, user.Phone, user.Email, user.ImagePath, role, user.OrganisatorID, time.Now().UTC())
+	const role = 3
+	row := r.db.QueryRow(query, user.Password, user.Name, user.Surname, user.Patronymic, user.BirthDate, user.Sex, user.Phone, user.Email, user.ImagePath, role, time.Now().UTC())
 	if err := row.Scan(&id); err != nil {
 		return 0, err
 	}

@@ -19,7 +19,7 @@ var userCtx = UserCtx{"userID", "roleID"}
 const (
 	authorizationHeader = "Authorization"
 	adminRoleID         = 1
-	ManagerRoleID       = 2
+	managerRoleID       = 2
 )
 
 func (h *Handler) userIdentity(c *gin.Context) {
@@ -97,7 +97,7 @@ func validateManagerAdminRole(c *gin.Context) (bool, error) {
 		return false, err
 	}
 
-	if roleID != adminRoleID && roleID != ManagerRoleID {
+	if roleID != adminRoleID && roleID != managerRoleID {
 		newErrorResponse(c, http.StatusForbidden, "insufficient role")
 		return false, errors.New("insufficient role")
 	}

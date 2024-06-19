@@ -15,12 +15,12 @@ import (
 // @Accept  json
 // @Produce  json
 // @Param id path int true "event id"
-// @Param input body app.Visitor true "visitor info"
+// @Param input body app.CreateVisitorInput true "visitor input"
 // @Success 200 {integer} integer 1
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events/{id}/visitors [post]
+// @Router /api/v1/public/events/{id}/visitors [post]
 func (h *Handler) createVisitor(c *gin.Context) {
 	eventID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -28,7 +28,7 @@ func (h *Handler) createVisitor(c *gin.Context) {
 		return
 	}
 
-	var input app.Visitor
+	var input app.CreateVisitorInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -57,7 +57,7 @@ func (h *Handler) createVisitor(c *gin.Context) {
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events/authorised/{id}/visitors [post]
+// @Router /api/v1/private/events/{id}/visitors [post]
 func (h *Handler) createVisitorAsUser(c *gin.Context) {
 	userID, err := getUserID(c)
 	if err != nil {
@@ -89,13 +89,12 @@ func (h *Handler) createVisitorAsUser(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param id path int true "event id"
-// @Success 200 {object} []app.Visitor
+// @Success 200 {object} []app.GetVisitorOutput
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events/authorised/{id}/visitors/ [get]
+// @Router /api/v1/private/events/{id}/visitors [get]
 func (h *Handler) getAllEventVisitors(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateManagerAdminRole(c)
 	if !valid {
 		return
@@ -130,13 +129,12 @@ func (h *Handler) getAllEventVisitors(c *gin.Context) {
 // @Produce  json
 // @Param id path int true "event id"
 // @Param visitor_id path int true "visitor id"
-// @Success 200 {object} app.Visitor
+// @Success 200 {object} app.GetVisitorOutput
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events/authorised/{id}/visitors/{visitor_id} [get]
+// @Router /api/v1/private/events/{id}/visitors/{visitor_id} [get]
 func (h *Handler) getVisitorByID(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateManagerAdminRole(c)
 	if !valid {
 		return
@@ -176,9 +174,8 @@ func (h *Handler) getVisitorByID(c *gin.Context) {
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events/authorised/{id}/visitors/{visitor_id} [delete]
+// @Router /api/v1/private/events/{id}/visitors/{visitor_id} [delete]
 func (h *Handler) deleteVisitor(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateManagerAdminRole(c)
 	if !valid {
 		return
@@ -218,15 +215,14 @@ func (h *Handler) deleteVisitor(c *gin.Context) {
 // @Produce  json
 // @Param id path int true "event id"
 // @Param visitor_id path int true "visitor id"
-// @Param input body app.UpdateVisitorInput true "visitor info"
+// @Param input body app.UpdateVisitorInput true "visitor input"
 // @Success 200 {integer} integer 1
 // @Failure 204 {object} errorResponse
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events/authorised/{id}/visitors/{visitor_id} [put]
+// @Router /api/v1/private/events/{id}/visitors/{visitor_id} [put]
 func (h *Handler) updateVisitor(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateManagerAdminRole(c)
 	if !valid {
 		return

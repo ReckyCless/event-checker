@@ -15,55 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/events": {
-            "get": {
-                "description": "get all events",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "events"
-                ],
-                "summary": "Get All Events",
-                "operationId": "get-all-events",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.getAllEventsResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "default": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/events/authorised": {
+        "/api/v1/private/events": {
             "get": {
                 "security": [
                     {
@@ -86,7 +38,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/handler.getAllEventsResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app.GetEventOutput"
+                            }
                         }
                     },
                     "400": {
@@ -135,12 +90,12 @@ const docTemplate = `{
                 "operationId": "create-event",
                 "parameters": [
                     {
-                        "description": "event info",
+                        "description": "event input",
                         "name": "input",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app.Event"
+                            "$ref": "#/definitions/app.CreateEventInput"
                         }
                     }
                 ],
@@ -178,7 +133,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/events/authorised/{id}": {
+        "/api/v1/private/events/{id}": {
             "put": {
                 "security": [
                     {
@@ -206,7 +161,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "event info",
+                        "description": "event input",
                         "name": "input",
                         "in": "body",
                         "required": true,
@@ -321,7 +276,70 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/events/authorised/{id}/visitors": {
+        "/api/v1/private/events/{id}/visitors": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get all event visitors",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "visitors"
+                ],
+                "summary": "Get All Event Visitors",
+                "operationId": "get-all-event-visitors",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "event id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app.GetVisitorOutput"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -383,72 +401,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/events/authorised/{id}/visitors/": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "get all event visitors",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "visitors"
-                ],
-                "summary": "Get All Event Visitors",
-                "operationId": "get-all-event-visitors",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "event id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/app.Visitor"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "default": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/events/authorised/{id}/visitors/{visitor_id}": {
+        "/api/v1/private/events/{id}/visitors/{visitor_id}": {
             "get": {
                 "security": [
                     {
@@ -487,7 +440,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.Visitor"
+                            "$ref": "#/definitions/app.GetVisitorOutput"
                         }
                     },
                     "400": {
@@ -550,7 +503,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "visitor info",
+                        "description": "visitor input",
                         "name": "input",
                         "in": "body",
                         "required": true,
@@ -672,66 +625,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/events/{id}": {
-            "get": {
-                "description": "get event by id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "events"
-                ],
-                "summary": "Get Event By ID",
-                "operationId": "get-event-by-id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "event id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/app.Event"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    },
-                    "default": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/handler.errorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/events/{id}/visitors": {
+        "/api/v1/private/organisators": {
             "post": {
-                "description": "create event visitor",
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "create organisator",
                 "consumes": [
                     "application/json"
                 ],
@@ -739,25 +640,18 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "visitors"
+                    "organisators"
                 ],
-                "summary": "Create Event Visitor",
-                "operationId": "create-event-visitor",
+                "summary": "Create Organisator",
+                "operationId": "create-organisator",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "event id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "visitor info",
+                        "description": "organisator input",
                         "name": "input",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app.Visitor"
+                            "$ref": "#/definitions/app.CreateOrganisatorInput"
                         }
                     }
                 ],
@@ -795,9 +689,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/types": {
-            "get": {
-                "description": "get all events created by user",
+        "/api/v1/private/organisators/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "update organisator",
                 "consumes": [
                     "application/json"
                 ],
@@ -805,18 +704,105 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "types"
+                    "organisators"
                 ],
-                "summary": "Get All Events Types",
-                "operationId": "get-all-events-types",
+                "summary": "Update Organisator by ID",
+                "operationId": "update-organisator",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "organisator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "organisator input",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.UpdateOrganisatorInput"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/app.EventType"
-                            }
+                            "type": "integer"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete organisator",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "organisators"
+                ],
+                "summary": "Delete Organisator by ID",
+                "operationId": "delete-organisator",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "organisator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "400": {
@@ -846,7 +832,84 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/types/authorised": {
+        "/api/v1/private/roles/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "update role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Update Role by ID",
+                "operationId": "update-role",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "role id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "role input",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.UpdateRoleInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/private/types": {
             "post": {
                 "security": [
                     {
@@ -867,12 +930,12 @@ const docTemplate = `{
                 "operationId": "create-event-type",
                 "parameters": [
                     {
-                        "description": "event type info",
+                        "description": "event type input",
                         "name": "input",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app.EventType"
+                            "$ref": "#/definitions/app.CreateEventTypeInput"
                         }
                     }
                 ],
@@ -910,7 +973,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/types/authorised/{id}": {
+        "/api/v1/private/types/{id}": {
             "put": {
                 "security": [
                     {
@@ -938,7 +1001,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "description": "event type info",
+                        "description": "event type input",
                         "name": "input",
                         "in": "body",
                         "required": true,
@@ -1053,9 +1116,14 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/types/{id}": {
-            "get": {
-                "description": "get event type by id",
+        "/api/v1/private/users/{id}/organisators": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "update user organisator",
                 "consumes": [
                     "application/json"
                 ],
@@ -1063,24 +1131,39 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "types"
+                    "users"
                 ],
-                "summary": "Get Event Type By ID",
-                "operationId": "get-event-type-by-id",
+                "summary": "User Affilation Modification",
+                "operationId": "update-user-organisator",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "event type id",
+                        "description": "user id",
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "role input",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.UserOrganisatorInput"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.EventType"
+                            "type": "integer"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
                         }
                     },
                     "400": {
@@ -1110,7 +1193,84 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/sign-in": {
+        "/api/v1/private/users/{id}/roles": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "update user role",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "User Role Modification",
+                "operationId": "update-user-role",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "role input",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.UserRoleInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/auth/sign-in": {
             "post": {
                 "description": "login",
                 "consumes": [
@@ -1169,7 +1329,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/sign-up": {
+        "/api/v1/public/auth/sign-up": {
             "post": {
                 "description": "create account",
                 "consumes": [
@@ -1185,12 +1345,12 @@ const docTemplate = `{
                 "operationId": "create-account",
                 "parameters": [
                     {
-                        "description": "account info",
+                        "description": "account input",
                         "name": "input",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/app.User"
+                            "$ref": "#/definitions/app.CreateUserInput"
                         }
                     }
                 ],
@@ -1227,10 +1387,513 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/v1/public/events": {
+            "get": {
+                "description": "get all events",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "events"
+                ],
+                "summary": "Get All Events",
+                "operationId": "get-all-events",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app.GetEventOutput"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/events/{id}": {
+            "get": {
+                "description": "get event by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "events"
+                ],
+                "summary": "Get Event By ID",
+                "operationId": "get-event-by-id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "event id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.GetEventOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/events/{id}/visitors": {
+            "post": {
+                "description": "create event visitor",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "visitors"
+                ],
+                "summary": "Create Event Visitor",
+                "operationId": "create-event-visitor",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "event id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "visitor input",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/app.CreateVisitorInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/organisators": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get all organisators",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "organisators"
+                ],
+                "summary": "Get All Organisators",
+                "operationId": "get-all-organisators",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app.GetOrganisatorOutput"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/organisators/{id}": {
+            "get": {
+                "description": "get organisator by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "organisators"
+                ],
+                "summary": "Get Organisator By ID",
+                "operationId": "get-organisator-by-id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "organisator id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.GetOrganisatorOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/roles": {
+            "get": {
+                "description": "get all roles",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Get All Roles",
+                "operationId": "get-all-roles",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app.Role"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/roles/{id}": {
+            "get": {
+                "description": "get role by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "roles"
+                ],
+                "summary": "Get Role By ID",
+                "operationId": "get-role-by-id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "role id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.Role"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/types": {
+            "get": {
+                "description": "get all events created by user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "types"
+                ],
+                "summary": "Get All Events Types",
+                "operationId": "get-all-events-types",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app.GetEventTypeOutput"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/public/types/{id}": {
+            "get": {
+                "description": "get event type by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "types"
+                ],
+                "summary": "Get Event Type By ID",
+                "operationId": "get-event-type-by-id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "event type id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.GetEventTypeOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/handler.errorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "app.Event": {
+        "app.CreateEventInput": {
             "type": "object",
             "required": [
                 "description",
@@ -1240,8 +1903,8 @@ const docTemplate = `{
                 "type_id"
             ],
             "properties": {
-                "created_at": {
-                    "type": "string"
+                "creator_id": {
+                    "type": "integer"
                 },
                 "description": {
                     "type": "string"
@@ -1263,15 +1926,254 @@ const docTemplate = `{
                 },
                 "type_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "app.CreateEventTypeInput": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.CreateOrganisatorInput": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "logo_path": {
+                    "type": "string"
+                },
+                "site_url": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.CreateUserInput": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password",
+                "surname"
+            ],
+            "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "image_path": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "patronymic": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "boolean"
+                },
+                "surname": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.CreateVisitorInput": {
+            "type": "object",
+            "required": [
+                "birth_date",
+                "name",
+                "patronymic",
+                "sex",
+                "surname"
+            ],
+            "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "event_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "patronymic": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "boolean"
+                },
+                "surname": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.GetEventOutput": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "creator_email": {
+                    "type": "string"
+                },
+                "creator_name": {
+                    "type": "string"
+                },
+                "creator_patronymic": {
+                    "type": "string"
+                },
+                "creator_phone": {
+                    "type": "string"
+                },
+                "creator_surname": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image_path": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "organisation_logo": {
+                    "type": "string"
+                },
+                "organisation_site_url": {
+                    "type": "string"
+                },
+                "organisation_title": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
                 },
                 "type_name": {
                     "type": "string"
                 },
-                "user_email": {
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.GetEventTypeOutput": {
+            "type": "object",
+            "properties": {
+                "created_at": {
                     "type": "string"
                 },
-                "user_id": {
+                "id": {
                     "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.GetOrganisatorOutput": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "logo_path": {
+                    "type": "string"
+                },
+                "site_url": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.GetVisitorOutput": {
+            "type": "object",
+            "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "event_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_visited": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "patronymic": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "sex": {
+                    "type": "boolean"
+                },
+                "surname": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_birth_date": {
+                    "type": "string"
+                },
+                "user_email": {
+                    "type": "string"
                 },
                 "user_name": {
                     "type": "string"
@@ -1282,20 +2184,20 @@ const docTemplate = `{
                 "user_phone": {
                     "type": "string"
                 },
+                "user_sex": {
+                    "type": "boolean"
+                },
                 "user_surname": {
                     "type": "string"
                 }
             }
         },
-        "app.EventType": {
+        "app.Role": {
             "type": "object",
             "required": [
                 "name"
             ],
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "integer"
                 },
@@ -1338,6 +2240,31 @@ const docTemplate = `{
                 }
             }
         },
+        "app.UpdateOrganisatorInput": {
+            "type": "object",
+            "properties": {
+                "logo_path": {
+                    "type": "string"
+                },
+                "site_url": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.UpdateRoleInput": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "app.UpdateVisitorInput": {
             "type": "object",
             "properties": {
@@ -1359,108 +2286,30 @@ const docTemplate = `{
                 "phone": {
                     "type": "string"
                 },
-                "surname": {
-                    "type": "string"
-                }
-            }
-        },
-        "app.User": {
-            "type": "object",
-            "required": [
-                "name",
-                "password",
-                "role_id",
-                "surname"
-            ],
-            "properties": {
-                "birth_date": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "image_path": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "organisator_id": {
-                    "type": "integer"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "patronymic": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "role_id": {
-                    "type": "integer"
-                },
-                "surname": {
-                    "type": "string"
-                }
-            }
-        },
-        "app.Visitor": {
-            "type": "object",
-            "required": [
-                "birth_date",
-                "name",
-                "patronymic",
-                "surname"
-            ],
-            "properties": {
-                "birth_date": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "event_id": {
-                    "type": "integer"
-                },
-                "is_visited": {
+                "sex": {
                     "type": "boolean"
                 },
-                "name": {
-                    "type": "string"
-                },
-                "patronymic": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
                 "surname": {
                     "type": "string"
-                },
-                "user_birth_date": {
-                    "type": "string"
-                },
-                "user_email": {
-                    "type": "string"
-                },
-                "user_name": {
-                    "type": "string"
-                },
-                "user_patronymic": {
-                    "type": "string"
-                },
-                "user_phone": {
-                    "type": "string"
-                },
-                "user_surname": {
-                    "type": "string"
+                }
+            }
+        },
+        "app.UserOrganisatorInput": {
+            "type": "object",
+            "properties": {
+                "organisator_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.UserRoleInput": {
+            "type": "object",
+            "required": [
+                "role_id"
+            ],
+            "properties": {
+                "role_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1469,17 +2318,6 @@ const docTemplate = `{
             "properties": {
                 "message": {
                     "type": "string"
-                }
-            }
-        },
-        "handler.getAllEventsResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/app.Event"
-                    }
                 }
             }
         },

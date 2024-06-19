@@ -13,19 +13,19 @@ func NewEventService(repo repository.Event) *EventService {
 	return &EventService{repo: repo}
 }
 
-func (s *EventService) Create(userID int, event app.Event) (int, error) {
+func (s *EventService) Create(userID int, event app.CreateEventInput) (int, error) {
 	return s.repo.Create(userID, event)
 }
 
-func (s *EventService) GetAll() ([]app.Event, error) {
+func (s *EventService) GetAll() ([]app.GetEventOutput, error) {
 	return s.repo.GetAll()
 }
 
-func (s *EventService) GetAllForUser(userID int) ([]app.Event, error) {
+func (s *EventService) GetAllForUser(userID int) ([]app.GetEventOutput, error) {
 	return s.repo.GetAllForUser(userID)
 }
 
-func (s *EventService) GetByID(eventID int) (app.Event, error) {
+func (s *EventService) GetByID(eventID int) (app.GetEventOutput, error) {
 	return s.repo.GetByID(eventID)
 }
 

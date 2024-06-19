@@ -15,14 +15,13 @@ import (
 // @ID create-event
 // @Accept  json
 // @Produce  json
-// @Param input body app.Event true "event info"
+// @Param input body app.CreateEventInput true "event input"
 // @Success 200 {integer} integer 1
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events/authorised [post]
+// @Router /api/v1/private/events [post]
 func (h *Handler) createEvent(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateManagerAdminRole(c)
 	if !valid {
 		return
@@ -33,7 +32,7 @@ func (h *Handler) createEvent(c *gin.Context) {
 		return
 	}
 
-	var input app.Event
+	var input app.CreateEventInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -50,10 +49,6 @@ func (h *Handler) createEvent(c *gin.Context) {
 	})
 }
 
-type getAllEventsResponse struct {
-	Data []app.Event `json:"data"`
-}
-
 // @Summary Get All Events by User
 // @Security ApiKeyAuth
 // @Tags events
@@ -61,13 +56,12 @@ type getAllEventsResponse struct {
 // @ID get-all-user-events
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} getAllEventsResponse
+// @Success 200 {object} []app.GetEventOutput
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events/authorised [get]
+// @Router /api/v1/private/events [get]
 func (h *Handler) getAllEventsForUser(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateManagerAdminRole(c)
 	if !valid {
 		return
@@ -84,9 +78,7 @@ func (h *Handler) getAllEventsForUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, getAllEventsResponse{
-		Data: events,
-	})
+	c.JSON(http.StatusOK, events)
 }
 
 // @Summary Get All Events
@@ -95,11 +87,11 @@ func (h *Handler) getAllEventsForUser(c *gin.Context) {
 // @ID get-all-events
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} getAllEventsResponse
+// @Success 200 {object} []app.GetEventOutput
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events [get]
+// @Router /api/v1/public/events [get]
 func (h *Handler) getAllEvents(c *gin.Context) {
 	events, err := h.services.Event.GetAll()
 	if err != nil {
@@ -107,9 +99,7 @@ func (h *Handler) getAllEvents(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, getAllEventsResponse{
-		Data: events,
-	})
+	c.JSON(http.StatusOK, events)
 }
 
 // @Summary Get Event By ID
@@ -119,11 +109,11 @@ func (h *Handler) getAllEvents(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param id path int true "event id"
-// @Success 200 {object} app.Event
+// @Success 200 {object} app.GetEventOutput
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events/{id} [get]
+// @Router /api/v1/public/events/{id} [get]
 func (h *Handler) getEventByID(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -153,9 +143,8 @@ func (h *Handler) getEventByID(c *gin.Context) {
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events/authorised/{id} [delete]
+// @Router /api/v1/private/events/{id} [delete]
 func (h *Handler) deleteEvent(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateManagerAdminRole(c)
 	if !valid {
 		return
@@ -196,15 +185,14 @@ func (h *Handler) deleteEvent(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param id path int true "event id"
-// @Param input body app.UpdateEventInput true "event info"
+// @Param input body app.UpdateEventInput true "event input"
 // @Success 200 {integer} integer 1
 // @Failure 204 {object} errorResponse
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/events/authorised/{id} [put]
+// @Router /api/v1/private/events/{id} [put]
 func (h *Handler) updateEvent(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateManagerAdminRole(c)
 	if !valid {
 		return

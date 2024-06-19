@@ -31,19 +31,25 @@ type CreateEventInput struct {
 }
 
 type GetEventOutput struct {
+	ID                  int        `json:"id" db:"id"`
 	Title               string     `json:"title" db:"title"`
 	Description         string     `json:"description" db:"description"`
 	TypeName            string     `json:"type_name" db:"type_name"`
+	TypeID              int        `json:"type_id" db:"type_id"`
 	Location            string     `json:"location" db:"location"`
 	StartTime           time.Time  `json:"start_time" db:"start_time"`
 	EndTime             *time.Time `json:"end_time" db:"end_time"`
 	ImagePath           *string    `json:"image_path" db:"image_path"`
-	CreatorOrganisation *string    `json:"creator_organisation" db:"creator_organisation"`
+	OrganisationTitle   *string    `json:"organisation_title" db:"organisation_title"`
+	OrganisationLogo    *string    `json:"organisation_logo" db:"organisation_logo"`
+	OrganisationSiteUrl *string    `json:"organisation_site_url" db:"organisation_site_url"`
 	CreatorName         *string    `json:"creator_name" db:"creator_name"`
 	CreatorSurname      *string    `json:"creator_surname" db:"creator_surname"`
 	CreatorPatronymic   *string    `json:"creator_patronymic" db:"creator_patronymic"`
 	CreatorEmail        *string    `json:"creator_email" db:"creator_email"`
 	CreatorPhone        *string    `json:"creator_phone" db:"creator_phone"`
+	CreatedAt           *time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt           *time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type UpdateEventInput struct {

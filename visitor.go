@@ -23,7 +23,6 @@ type Visitor struct {
 
 type CreateVisitorInput struct {
 	EventID    int       `json:"event_id" db:"event_id"`
-	UserID     *int      `json:"user_id" db:"user_id"`
 	Name       string    `json:"name" db:"name" binding:"required"`
 	Surname    string    `json:"surname" db:"surname" binding:"required"`
 	Patronymic string    `json:"patronymic" db:"patronymic" binding:"required"`
@@ -34,6 +33,7 @@ type CreateVisitorInput struct {
 }
 
 type GetVisitorOutput struct {
+	ID             int        `json:"id" db:"id"`
 	EventName      string     `json:"event_name" db:"event_name"`
 	IsVisited      bool       `json:"is_visited" db:"is_visited"`
 	Name           *string    `json:"name" db:"name"`

@@ -18,7 +18,7 @@ func NewEventTypePostgres(db *sqlx.DB) *EventTypePostgres {
 	return &EventTypePostgres{db: db}
 }
 
-func (r *EventTypePostgres) Create(eventType app.EventType) (int, error) {
+func (r *EventTypePostgres) Create(eventType app.CreateEventTypeInput) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
@@ -42,8 +42,8 @@ func (r *EventTypePostgres) Create(eventType app.EventType) (int, error) {
 	return eventTypeID, tx.Commit()
 }
 
-func (r *EventTypePostgres) GetAll() ([]app.EventType, error) {
-	var eventTypes []app.EventType
+func (r *EventTypePostgres) GetAll() ([]app.GetEventTypeOutput, error) {
+	var eventTypes []app.GetEventTypeOutput
 	query := fmt.Sprintf(`SELECT * FROM %s`, eventsTypesTable)
 	if err := r.db.Select(&eventTypes, query); err != nil {
 		return nil, err
@@ -52,8 +52,8 @@ func (r *EventTypePostgres) GetAll() ([]app.EventType, error) {
 	return eventTypes, nil
 }
 
-func (r *EventTypePostgres) GetByID(eventTypeID int) (app.EventType, error) {
-	var eventType app.EventType
+func (r *EventTypePostgres) GetByID(eventTypeID int) (app.GetEventTypeOutput, error) {
+	var eventType app.GetEventTypeOutput
 	query := fmt.Sprintf(`SELECT *
 	FROM %s WHERE id=$1`, eventsTypesTable)
 	if err := r.db.Get(&eventType, query, eventTypeID); err != nil {
@@ -86,6 +86,10 @@ func (r *EventTypePostgres) Update(eventTypeID int, input app.UpdateEventTypeInp
 		args = append(args, *input.Name)
 		argID++
 	}
+	// Set UpdatedAt Time
+	setValues = append(setValues, fmt.Sprintf("updated_at=$%d", argID))
+	args = append(args, time.Now().UTC())
+	argID++
 
 	setQuery := strings.Join(setValues, ", ")
 

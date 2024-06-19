@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	app "github.com/reckycless/event-checker"
@@ -16,7 +17,7 @@ func NewUserPostgres(db *sqlx.DB) *UserPostgres {
 }
 
 func (r *UserPostgres) UpdateUserRole(userID int, input app.UserRoleInput) (int64, error) {
-	query := fmt.Sprintf(`UPDATE %s SET role_id=$1 WHERE id=$2`,
+	query := fmt.Sprintf(`UPDATE %s SET role_id=$1, updated_at=$2 WHERE id=$2`,
 		usersTable)
 
 	result, err := r.db.Exec(query, input.RoleID, userID)
@@ -29,10 +30,10 @@ func (r *UserPostgres) UpdateUserRole(userID int, input app.UserRoleInput) (int6
 }
 
 func (r *UserPostgres) UpdateUserOrganisator(userID int, input app.UserOrganisatorInput) (int64, error) {
-	query := fmt.Sprintf(`UPDATE %s SET organisator_id=$1 WHERE id=$2`,
+	query := fmt.Sprintf(`UPDATE %s SET organisator_id=$1, updated_at=$2 WHERE id=$3`,
 		usersTable)
 
-	result, err := r.db.Exec(query, input.OrganisatorID, userID)
+	result, err := r.db.Exec(query, input.OrganisatorID, time.Now().UTC(), userID)
 	rowsAffected, errRows := result.RowsAffected()
 	if errRows != nil {
 		return 0, errRows

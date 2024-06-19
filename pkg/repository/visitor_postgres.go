@@ -18,7 +18,7 @@ func NewVisitorPostgres(db *sqlx.DB) *VisitorPostgres {
 	return &VisitorPostgres{db: db}
 }
 
-// Creating the visitor/Siging up for the event (Authorized)
+// Creating the visitor/Siging up for the event (Private / Authorized)
 func (r *VisitorPostgres) CreateAsUser(userID, eventID int) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -48,8 +48,8 @@ func (r *VisitorPostgres) CreateAsUser(userID, eventID int) (int, error) {
 	return visitorID, tx.Commit()
 }
 
-// Creating the visitor/Siging up for the event (NON-Authorized)
-func (r *VisitorPostgres) Create(eventID int, visitor app.Visitor) (int, error) {
+// Creating the visitor/Signing up for the event (Public/Without auth)
+func (r *VisitorPostgres) Create(eventID int, visitor app.CreateVisitorInput) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
@@ -64,10 +64,11 @@ func (r *VisitorPostgres) Create(eventID int, visitor app.Visitor) (int, error) 
 		surname, 
 		patronymic,
 		birth_date,
+		sex,
 		phone,
 		email, 
 		created_at)
-		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 		RETURNING id`, eventsVisitorsTable)
 	row := tx.QueryRow(
 		createVisitorQuery,
@@ -77,6 +78,7 @@ func (r *VisitorPostgres) Create(eventID int, visitor app.Visitor) (int, error) 
 		visitor.Surname,
 		visitor.Patronymic,
 		visitor.BirthDate,
+		visitor.Sex,
 		visitor.Phone,
 		visitor.Email,
 		time.Now().UTC())
@@ -88,13 +90,14 @@ func (r *VisitorPostgres) Create(eventID int, visitor app.Visitor) (int, error) 
 	return visitorID, tx.Commit()
 }
 
-func (r *VisitorPostgres) GetAllEventVisitors(userID, eventID int) ([]app.Visitor, error) {
-	var visitors []app.Visitor
-	// TODO: CHECK WITH NORMAL DATE IN USERS SOMEDAY AND CHANGE ti.birth_date To li.birth_date
+func (r *VisitorPostgres) GetAllEventVisitors(userID, eventID int) ([]app.GetVisitorOutput, error) {
+	var visitors []app.GetVisitorOutput
+	// TODO: CHECK WITH NORMAL DATE IN USERS SOMEDAY AND CHANGE ti.birth_date To li.birth_date 2024-05-08 DONE**
 	query := fmt.Sprintf(`SELECT 
-	ti.name, ti.surname, ti.patronymic, ti.birth_date, ti.phone, ti.email, ti.is_visited, ti.created_at,
+	ti.name, ti.surname, ti.patronymic, ti.birth_date, ti.sex, ti.phone, ti.email, ti.is_visited, ti.created_at, ti.updated_at,
 	li.name as user_name, li.surname as user_surname, li.patronymic as user_patronymic, 
-	ti.birth_date as user_birth_date, li.email as user_email, li.phone as user_phone
+	li.birth_date as user_birth_date, li.sex as user_sex, li.email as user_email, li.phone as user_phone,
+	ul.title as event_name
 	FROM %s ti INNER JOIN %s ul on ul.id = ti.event_id LEFT JOIN %s li on li.id = ti.user_id WHERE ul.user_id = $1 AND ti.event_id = $2`, eventsVisitorsTable, eventsTable, usersTable)
 	if err := r.db.Select(&visitors, query, userID, eventID); err != nil {
 		return nil, err
@@ -103,13 +106,14 @@ func (r *VisitorPostgres) GetAllEventVisitors(userID, eventID int) ([]app.Visito
 	return visitors, nil
 }
 
-func (r *VisitorPostgres) GetByID(userID, visitorID int) (app.Visitor, error) {
-	var visitor app.Visitor
-	// TODO: CHECK WITH NORMAL DATE IN USERS SOMEDAY AND CHANGE ti.birth_date To li.birth_date
+func (r *VisitorPostgres) GetByID(userID, visitorID int) (app.GetVisitorOutput, error) {
+	var visitor app.GetVisitorOutput
+	// TODO: CHECK WITH NORMAL DATE IN USERS SOMEDAY AND CHANGE ti.birth_date To li.birth_date 2024-05-08 DONE**
 	query := fmt.Sprintf(`SELECT 
-	ti.name, ti.surname, ti.patronymic, ti.birth_date, ti.phone, ti.email, ti.is_visited, ti.created_at,
+	ti.name, ti.surname, ti.patronymic, ti.birth_date, ti.sex, ti.phone, ti.email, ti.is_visited, ti.created_at, ti.updated_at,
 	li.name as user_name, li.surname as user_surname, li.patronymic as user_patronymic, 
-	ti.birth_date as user_birth_date, li.email as user_email, li.phone as user_phone
+	li.birth_date as user_birth_date, li.sex as user_sex, li.email as user_email, li.phone as user_phone,
+	ul.title as event_name
 	FROM %s ti INNER JOIN %s ul on ul.id = ti.event_id LEFT JOIN %s li on li.id = ti.user_id WHERE ul.user_id = $1 AND ti.id = $2`, eventsVisitorsTable, eventsTable, usersTable)
 	if err := r.db.Get(&visitor, query, userID, visitorID); err != nil {
 		return visitor, err
@@ -156,6 +160,11 @@ func (r *VisitorPostgres) Update(userID, visitorID int, input app.UpdateVisitorI
 		args = append(args, *input.BirthDate)
 		argID++
 	}
+	if input.Sex != nil {
+		setValues = append(setValues, fmt.Sprintf("sex=$%d", argID))
+		args = append(args, *input.Sex)
+		argID++
+	}
 	if input.Email != nil {
 		setValues = append(setValues, fmt.Sprintf("email=$%d", argID))
 		args = append(args, *input.Email)
@@ -171,6 +180,10 @@ func (r *VisitorPostgres) Update(userID, visitorID int, input app.UpdateVisitorI
 		args = append(args, *input.IsVisited)
 		argID++
 	}
+	// Set UpdatedAt Time
+	setValues = append(setValues, fmt.Sprintf("updated_at=$%d", argID))
+	args = append(args, time.Now().UTC())
+	argID++
 
 	setQuery := strings.Join(setValues, ", ")
 

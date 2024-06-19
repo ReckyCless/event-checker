@@ -15,20 +15,19 @@ import (
 // @ID create-event-type
 // @Accept  json
 // @Produce  json
-// @Param input body app.EventType true "event type info"
+// @Param input body app.CreateEventTypeInput true "event type input"
 // @Success 200 {integer} integer 1
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/types/authorised [post]
+// @Router /api/v1/private/types [post]
 func (h *Handler) createEventType(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateAdminRole(c)
 	if !valid {
 		return
 	}
 
-	var input app.EventType
+	var input app.CreateEventTypeInput
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
@@ -51,11 +50,11 @@ func (h *Handler) createEventType(c *gin.Context) {
 // @ID get-all-events-types
 // @Accept  json
 // @Produce  json
-// @Success 200 {object} []app.EventType
+// @Success 200 {object} []app.GetEventTypeOutput
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/types [get]
+// @Router /api/v1/public/types [get]
 func (h *Handler) getAllEventTypes(c *gin.Context) {
 	eventTypes, err := h.services.EventType.GetAll()
 	if err != nil {
@@ -73,11 +72,11 @@ func (h *Handler) getAllEventTypes(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param id path int true "event type id"
-// @Success 200 {object} app.EventType
+// @Success 200 {object} app.GetEventTypeOutput
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/types/{id} [get]
+// @Router /api/v1/public/types/{id} [get]
 func (h *Handler) getEventTypeByID(c *gin.Context) {
 	eventTypeID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -107,9 +106,8 @@ func (h *Handler) getEventTypeByID(c *gin.Context) {
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/types/authorised/{id} [delete]
+// @Router /api/v1/private/types/{id} [delete]
 func (h *Handler) deleteEventType(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateAdminRole(c)
 	if !valid {
 		return
@@ -143,15 +141,14 @@ func (h *Handler) deleteEventType(c *gin.Context) {
 // @Accept  json
 // @Produce  json
 // @Param id path int true "event type id"
-// @Param input body app.UpdateEventTypeInput true "event type info"
+// @Param input body app.UpdateEventTypeInput true "event type input"
 // @Success 200 {integer} integer 1
 // @Failure 204 {object} errorResponse
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
-// @Router /api/types/authorised/{id} [put]
+// @Router /api/v1/private/types/{id} [put]
 func (h *Handler) updateEventType(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateAdminRole(c)
 	if !valid {
 		return

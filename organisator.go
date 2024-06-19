@@ -11,6 +11,7 @@ type Organisator struct {
 	LogoPath  *string    `json:"logo_path" db:"logo_path"`
 	SiteUrl   *string    `json:"site_url" db:"site_url"`
 	CreatedAt *time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type CreateOrganisatorInput struct {
@@ -20,9 +21,12 @@ type CreateOrganisatorInput struct {
 }
 
 type GetOrganisatorOutput struct {
-	Title    string  `json:"title" db:"title"`
-	LogoPath *string `json:"logo_path" db:"logo_path"`
-	SiteUrl  *string `json:"site_url" db:"site_url"`
+	ID        int        `json:"id" db:"id"`
+	Title     string     `json:"title" db:"title"`
+	LogoPath  *string    `json:"logo_path" db:"logo_path"`
+	SiteUrl   *string    `json:"site_url" db:"site_url"`
+	CreatedAt *time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
 }
 
 type UpdateOrganisatorInput struct {

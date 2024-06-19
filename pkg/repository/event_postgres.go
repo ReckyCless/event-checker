@@ -18,7 +18,7 @@ func NewEventPostgres(db *sqlx.DB) *EventPostgres {
 	return &EventPostgres{db: db}
 }
 
-func (r *EventPostgres) Create(userID int, event app.Event) (int, error) {
+func (r *EventPostgres) Create(userID int, event app.CreateEventInput) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
@@ -32,7 +32,7 @@ func (r *EventPostgres) Create(userID int, event app.Event) (int, error) {
 		image_path, 
 		start_time, 
 		end_time,
-		user_id,
+		creator_id,
 		type_id,
 		created_at)
 		VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
@@ -56,45 +56,49 @@ func (r *EventPostgres) Create(userID int, event app.Event) (int, error) {
 	return id, tx.Commit()
 }
 
-func (r *EventPostgres) GetAll() ([]app.Event, error) {
-	var events []app.Event
-	query := fmt.Sprintf(`SELECT ti.id, ti.title, ti.description, ti.location, 
+func (r *EventPostgres) GetAll() ([]app.GetEventOutput, error) {
+	var events []app.GetEventOutput
+	query := fmt.Sprintf(`SELECT ti.id, ti.title, ti.description, ti.location, ti.type_id,
 		ti.start_time, ti.end_time, ti.image_path,
-		li.name as user_name, li.surname as user_surname, li.patronymic as user_patronymic, li.email as user_email, li.phone as user_phone,
+		li.name as creator_name, li.surname as creator_surname, li.patronymic as creator_patronymic, li.email as creator_email, li.phone as creator_phone,
+		mt.title as organisation_title, mt.logo_path as organisation_logo, mt.site_url as organisation_site_url,
 		ul.name as type_name,
-		ti.user_id, ti.type_id, ti.created_at
-		FROM %s ti INNER JOIN %s li on ti.user_id = li.id INNER JOIN %s ul on ti.type_id = ul.id`, eventsTable, usersTable, eventsTypesTable)
+		ti.created_at, ti.updated_at
+		FROM %s ti INNER JOIN %s li on ti.creator_id = li.id INNER JOIN %s ul on ti.type_id = ul.id LEFT JOIN %s mt on li.organisator_id = mt.id`,
+		eventsTable, usersTable, eventsTypesTable, organisatorsTable)
 
 	err := r.db.Select(&events, query)
 
 	return events, err
 }
 
-func (r *EventPostgres) GetAllForUser(userID int) ([]app.Event, error) {
-	var events []app.Event
-	query := fmt.Sprintf(`SELECT ti.id, ti.title, ti.description, ti.location, 
-			ti.start_time, ti.end_time, ti.image_path,
-			li.name as user_name, li.surname as user_surname, li.patronymic as user_patronymic, li.email as user_email, li.phone as user_phone,
-			ul.name as type_name,
-			ti.user_id, ti.type_id, ti.created_at
-		  	FROM %s ti INNER JOIN %s li on ti.user_id = li.id INNER JOIN %s ul on ti.type_id = ul.id
-			WHERE ti.user_id = $1`, eventsTable, usersTable, eventsTypesTable)
+func (r *EventPostgres) GetAllForUser(userID int) ([]app.GetEventOutput, error) {
+	var events []app.GetEventOutput
+	query := fmt.Sprintf(`SELECT ti.id, ti.title, ti.description, ti.location, ti.type_id,
+		ti.start_time, ti.end_time, ti.image_path,
+		li.name as creator_name, li.surname as creator_surname, li.patronymic as creator_patronymic, li.email as creator_email, li.phone as creator_phone,
+		mt.title as organisation_title, mt.logo_path as organisation_logo, mt.site_url as organisation_site_url,
+		ul.name as type_name,
+		ti.created_at, ti.updated_at
+		FROM %s ti INNER JOIN %s li on ti.creator_id = li.id INNER JOIN %s ul on ti.type_id = ul.id LEFT JOIN %s mt on li.organisator_id = mt.id
+		WHERE ti.creator_id = $1`,
+		eventsTable, usersTable, eventsTypesTable, organisatorsTable)
 
 	err := r.db.Select(&events, query, userID)
 
 	return events, err
 }
 
-func (r *EventPostgres) GetByID(eventID int) (app.Event, error) {
-	var event app.Event
-
-	query := fmt.Sprintf(`SELECT ti.id, ti.title, ti.description, ti.location, 
+func (r *EventPostgres) GetByID(eventID int) (app.GetEventOutput, error) {
+	var event app.GetEventOutput
+	query := fmt.Sprintf(`SELECT ti.id, ti.title, ti.description, ti.location, ti.type_id,
 		ti.start_time, ti.end_time, ti.image_path,
-		li.name as user_name, li.surname as user_surname, li.patronymic as user_patronymic, li.email as user_email, li.phone as user_phone,
+		li.name as creator_name, li.surname as creator_surname, li.patronymic as creator_patronymic, li.email as creator_email, li.phone as creator_phone,
+		mt.title as organisation_title, mt.logo_path as organisation_logo, mt.site_url as organisation_site_url,
 		ul.name as type_name,
-		ti.user_id, ti.type_id, ti.created_at
-		FROM %s ti INNER JOIN %s li on ti.user_id = li.id INNER JOIN %s ul on ti.type_id = ul.id
-		WHERE ti.id = $1`, eventsTable, usersTable, eventsTypesTable)
+		ti.created_at, ti.updated_at
+		FROM %s ti INNER JOIN %s li on ti.creator_id = li.id INNER JOIN %s ul on ti.type_id = ul.id LEFT JOIN %s mt on li.organisator_id = mt.id
+		WHERE ti.id = $1`, eventsTable, usersTable, eventsTypesTable, organisatorsTable)
 
 	err := r.db.Get(&event, query, eventID)
 
@@ -102,7 +106,7 @@ func (r *EventPostgres) GetByID(eventID int) (app.Event, error) {
 }
 
 func (r *EventPostgres) Delete(userID, eventID int) (int64, error) {
-	query := fmt.Sprintf("DELETE FROM %s WHERE user_id=$1 AND id=$2",
+	query := fmt.Sprintf("DELETE FROM %s WHERE creator_id=$1 AND id=$2",
 		eventsTable)
 
 	result, err := r.db.Exec(query, userID, eventID)
@@ -154,10 +158,14 @@ func (r *EventPostgres) Update(userID, eventID int, input app.UpdateEventInput) 
 		args = append(args, *input.TypeID)
 		argID++
 	}
+	// Set UpdatedAt Time
+	setValues = append(setValues, fmt.Sprintf("updated_at=$%d", argID))
+	args = append(args, time.Now().UTC())
+	argID++
 
 	setQuery := strings.Join(setValues, ", ")
 
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d AND user_id=$%d",
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE id=$%d AND creator_id=$%d",
 		eventsTable, setQuery, argID, argID+1)
 
 	args = append(args, eventID, userID)

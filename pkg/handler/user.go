@@ -8,8 +8,22 @@ import (
 	app "github.com/reckycless/event-checker"
 )
 
+// @Summary User Role Modification
+// @Security ApiKeyAuth
+// @Tags users
+// @Description update user role
+// @ID update-user-role
+// @Accept  json
+// @Produce  json
+// @Param id path int true "user id"
+// @Param input body app.UserRoleInput true "role input"
+// @Success 200 {integer} integer 1
+// @Failure 204 {object} errorResponse
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/v1/private/users/{id}/roles [put]
 func (h *Handler) updateUserRole(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateAdminRole(c)
 	if !valid {
 		return
@@ -43,8 +57,22 @@ func (h *Handler) updateUserRole(c *gin.Context) {
 	})
 }
 
+// @Summary User Affilation Modification
+// @Security ApiKeyAuth
+// @Tags users
+// @Description update user organisator
+// @ID update-user-organisator
+// @Accept  json
+// @Produce  json
+// @Param id path int true "user id"
+// @Param input body app.UserOrganisatorInput true "role input"
+// @Success 200 {integer} integer 1
+// @Failure 204 {object} errorResponse
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /api/v1/private/users/{id}/organisators [put]
 func (h *Handler) updateUserOrganisator(c *gin.Context) {
-	//TODO: EDIT REPOSITORY TO MANAGE ROLES
 	valid, _ := validateAdminRole(c)
 	if !valid {
 		return
